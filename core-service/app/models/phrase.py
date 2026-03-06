@@ -5,8 +5,7 @@ from sqlalchemy.orm import mapped_column, Mapped, relationship
 from sqlalchemy import TIMESTAMP, ForeignKey, CheckConstraint, Numeric
 
 from app.models.base import Base
-
-
+from app.models.language import Language
 class Phrase(Base):
     """A vocabulary entry captured by a user from subtitles or other sources."""
 
