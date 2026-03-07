@@ -37,3 +37,16 @@ class PhraseCreate(BaseModel):
     original_text: str
     translated_text: str
     pronunciation: str | None = None
+
+class TranslateRequest(BaseModel):
+    text: str
+    source_lang: str
+    target_lang: str
+
+class TranslateResponse(BaseModel):
+    original: str
+    translated_text: str
+    pronunciation: str | None = None
+    source_lang: str
+    target_lang: str
+    provider: str
