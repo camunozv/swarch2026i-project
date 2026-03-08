@@ -35,16 +35,24 @@ core-service/
 │   │   ├── phrase.py          # Phrase and ReviewData models
 │   │   └── review.py
 │   ├── routes/
-│   │   └── phrases.py         # /phrases endpoints
+│   │   ├── phrases.py         # /phrases endpoints
+│   │   └── translate.py       # /translate endpoint
 │   ├── schemas/
 │   │   └── phrases.py         # Pydantic request/response schemas
 │   ├── services/
-│   │   └── phrase_service.py  # Business logic layer
+│   │   ├── phrase_service.py  # Business logic for phrases and SM-2 reviews
+│   │   ├── translation_service.py  # Multi-provider translation orchestrator
+│   │   ├── sm2.py             # SM-2 spaced repetition algorithm
+│   │   └── providers/
+│   │       ├── base.py        # Abstract TranslationProvider interface
+│   │       ├── deepl.py       # DeepL API provider (500k chars/month free)
+│   │       ├── libretranslate.py  # LibreTranslate provider (no API key required)
+│   │       └── mymemory.py    # MyMemory provider (fallback)
 │   └── main.py                # FastAPI app factory
 ├── scripts/
 │   └── migrate.sh             # Convenience wrapper: prints state, runs upgrade head
-├── alembic.ini                # Alembic configuration file
-├── docker-compose.yml         # PostgreSQL container
+├── alembic.ini
+├── docker-compose.yml
 ├── pyproject.toml
 └── .env.example
 ```
@@ -81,9 +89,36 @@ Holds the SM-2 algorithm state for each phrase.
 
 ## API Endpoints
 
-| Method | Path       | Description              |
-|--------|------------|--------------------------|
-| `GET`  | `/phrases` | List all phrases         |
+| Method   | Path                      | Description                              |
+|----------|---------------------------|------------------------------------------|
+| `GET`    | `/phrases`                | List all active phrases                  |
+| `POST`   | `/phrases`                | Create a new phrase                      |
+| `GET`    | `/phrases/due`            | Get phrases due for review today         |
+| `GET`    | `/phrases/{id}`           | Get a phrase by ID                       |
+| `DELETE` | `/phrases/{id}`           | Soft-delete a phrase                     |
+| `POST`   | `/phrases/{id}/review`    | Submit SM-2 review result (quality 0–5)  |
+| `POST`   | `/translate`              | Translate text via multi-provider system |
+
+
+## Translation Providers
+
+The `/translate` endpoint tries providers in order, falling back to the next if one fails or is unavailable:
+
+1. **DeepL** — highest quality, requires `DEEPL_API_KEY`, 500k chars/month free tier
+2. **LibreTranslate** — open source, no API key required by default
+3. **MyMemory** — public API, used as last resort fallback
+
+## SM-2 Algorithm
+
+The `POST /phrases/{id}/review` endpoint accepts a `quality` score (0–5) and updates the phrase scheduling:
+
+| Quality | Meaning                        |
+|---------|--------------------------------|
+| 0 – 2   | Failed — interval resets to 1 day |
+| 3       | Recalled with difficulty       |
+| 4       | Recalled correctly             |
+| 5       | Perfect recall                 |
+
 
 
 Interactive docs are available at `/docs` when `DEBUG=true`.
@@ -110,6 +145,11 @@ POSTGRES_PORT=5432
 
 # Set to true to enable the interactive docs at /docs (disable in production)
 DEBUG=true
+
+# Translation providers (optional — service falls back if not set)
+DEEPL_API_KEY=your_deepl_api_key_here
+LIBRETRANSLATE_URL=https://libretranslate.com
+LIBRETRANSLATE_API_KEY=         # optional
 ```
 
 ## Running Locally
