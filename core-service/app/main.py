@@ -10,6 +10,7 @@ from app.models import phrase
 from app.models import language
 from app.routes import translate
 from app.routes import review_history
+from app.routes import anki
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -35,6 +36,7 @@ def get_app() -> FastAPI:
     app.include_router(phrases.router)
     app.include_router(translate.router)
     app.include_router(review_history.router)
+    app.include_router(anki.router)
     return app
 
 app = get_app()
