@@ -19,13 +19,15 @@ public class UserStreakServiceImplementation implements UserStreakService {
     UserStreakMapper userStreakMapper;
 
     @Override
-    public UserStreakDTO registerUserActivity(UserStreak newUserActivity) {
+    public UserStreakDTO registerUserActivity(String userName) {
 
         LocalDate today = LocalDate.now();
 
-        UserStreak currentUserStreak = userStreakRepository.getUserStreakByUserName(newUserActivity.getUserName());
+        UserStreak currentUserStreak = userStreakRepository.getUserStreakByUserName(userName);
 
         if (currentUserStreak == null) {
+            UserStreak newUserActivity = new UserStreak();
+            newUserActivity.setUserName(userName);
             newUserActivity.setCurrentStreak(1);
             newUserActivity.setLastDateOfActivity(today);
             newUserActivity.setLongestStreak(1);
@@ -48,6 +50,6 @@ public class UserStreakServiceImplementation implements UserStreakService {
             userStreakRepository.save(currentUserStreak);
         }
 
-        return userStreakMapper.toUserStreakDTO(userStreakRepository.getUserStreakByUserName(newUserActivity.getUserName()));
+        return userStreakMapper.toUserStreakDTO(userStreakRepository.getUserStreakByUserName(userName));
     }
 }
