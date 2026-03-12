@@ -5,18 +5,19 @@ import com.carlos.gamificationservice.dtos.dtosImpl.UserStreakDTO;
 import com.carlos.gamificationservice.models.UserStreak;
 import com.carlos.gamificationservice.repository.UserStreakRepository;
 import com.carlos.gamificationservice.services.UserStreakService;
-import lombok.AllArgsConstructor;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserStreakServiceImplementation implements UserStreakService {
 
-    UserStreakRepository userStreakRepository;
-    UserStreakMapper userStreakMapper;
+    private final UserStreakRepository userStreakRepository;
+    private final UserStreakMapper userStreakMapper;
 
     @Override
     public UserStreakDTO registerUserActivity(String userName) {
