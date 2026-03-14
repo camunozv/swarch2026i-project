@@ -134,7 +134,7 @@ public class UserGameSessionControllerTest {
 
     @Test
     public void testGetAllUserGameSessions_Success() throws Exception {
-        List<UserGameSession> gameSessions = List.of(new UserGameSession(), new UserGameSession());
+        List<UserGameSession> gameSessions = List.of(new UserGameSession(1L,userName,gamePlayed, 12, intendedDate), new UserGameSession(2L,userName,gamePlayed, 12, intendedDate));
 
         when(userGameSessionService.getAllUserGameSessions(userName)).thenReturn(gameSessions);
 
