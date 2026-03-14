@@ -9,5 +9,4 @@ public class GamificationServiceApplication {
     public static void main(String[] args) {
         SpringApplication.run(GamificationServiceApplication.class, args);
     }
-
 }
